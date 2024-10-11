@@ -3,27 +3,29 @@ Test01.elf:     file format elf32-avr
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
-  0 .data         00000000  00800100  00800100  000000f8  2**0
+  0 .data         00000000  00800100  00800100  000001a0  2**0
                   CONTENTS, ALLOC, LOAD, DATA
-  1 .text         000000a4  00000000  00000000  00000054  2**1
+  1 .text         0000014c  00000000  00000000  00000054  2**1
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  2 .comment      00000030  00000000  00000000  000000f8  2**0
+  2 .comment      00000030  00000000  00000000  000001a0  2**0
                   CONTENTS, READONLY
-  3 .note.gnu.avr.deviceinfo 0000003c  00000000  00000000  00000128  2**2
+  3 .note.gnu.avr.deviceinfo 0000003c  00000000  00000000  000001d0  2**2
                   CONTENTS, READONLY
-  4 .debug_aranges 00000020  00000000  00000000  00000164  2**0
+  4 .debug_aranges 00000028  00000000  00000000  0000020c  2**0
                   CONTENTS, READONLY, DEBUGGING
-  5 .debug_info   000007fd  00000000  00000000  00000184  2**0
+  5 .debug_info   00000996  00000000  00000000  00000234  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_abbrev 00000761  00000000  00000000  00000981  2**0
+  6 .debug_abbrev 00000834  00000000  00000000  00000bca  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_line   000001a3  00000000  00000000  000010e2  2**0
+  7 .debug_line   0000030b  00000000  00000000  000013fe  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_frame  00000024  00000000  00000000  00001288  2**2
+  8 .debug_frame  00000034  00000000  00000000  0000170c  2**2
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_str    000003ae  00000000  00000000  000012ac  2**0
+  9 .debug_str    00000411  00000000  00000000  00001740  2**0
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_ranges 00000010  00000000  00000000  0000165a  2**0
+ 10 .debug_loc    00000133  00000000  00000000  00001b51  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 11 .debug_ranges 00000018  00000000  00000000  00001c84  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -107,23 +109,150 @@ Disassembly of section .text:
   92:	d0 e1       	ldi	r29, 0x10	; 16
   94:	de bf       	out	0x3e, r29	; 62
   96:	cd bf       	out	0x3d, r28	; 61
-  98:	02 d0       	rcall	.+4      	; 0x9e <main>
-  9a:	02 c0       	rjmp	.+4      	; 0xa0 <_exit>
+  98:	0c d0       	rcall	.+24     	; 0xb2 <main>
+  9a:	56 c0       	rjmp	.+172    	; 0x148 <_exit>
 
 0000009c <__bad_interrupt>:
   9c:	b1 cf       	rjmp	.-158    	; 0x0 <__vectors>
 
-0000009e <main>:
+0000009e <Check>:
+#include <util/delay.h> //delay함수 헤더
+//  SW PORT : PG3, Input
+// LED Port : PG4, Output
+int Check()
+{
+		    char v = PING & 0x08;  // v = G그룹 3번 bit의 값 1000 = 8
+  9e:	80 91 63 00 	lds	r24, 0x0063	; 0x800063 <__TEXT_REGION_LENGTH__+0x7e0063>
+		    if( v == 0 ) return 1; // Pushed !!!
+  a2:	83 fd       	sbrc	r24, 3
+  a4:	03 c0       	rjmp	.+6      	; 0xac <Check+0xe>
+  a6:	81 e0       	ldi	r24, 0x01	; 1
+  a8:	90 e0       	ldi	r25, 0x00	; 0
+  aa:	08 95       	ret
+			return 0;
+  ac:	80 e0       	ldi	r24, 0x00	; 0
+  ae:	90 e0       	ldi	r25, 0x00	; 0
+}
+  b0:	08 95       	ret
 
-#include <avr/io.h>
-
+000000b2 <main>:
 
 int main(void)
 {
-  9e:	ff cf       	rjmp	.-2      	; 0x9e <main>
 
-000000a0 <_exit>:
-  a0:	f8 94       	cli
+   DDRG |= 0x10;		// xxxx xxxx ==> xxx1 xxxx: 1=출력   |= 비트 or로 두면 출력만 1이면 된다는 뜻
+  b2:	e4 e6       	ldi	r30, 0x64	; 100
+  b4:	f0 e0       	ldi	r31, 0x00	; 0
+  b6:	80 81       	ld	r24, Z
+  b8:	80 61       	ori	r24, 0x10	; 16
+  ba:	80 83       	st	Z, r24
+   DDRG &= ~0x08;		// xxxx xxxx ==> xxxx 0xxx: 0=입력   &= ~0x00 출력 0으로 만든다는 뜻
+  bc:	80 81       	ld	r24, Z
+  be:	87 7f       	andi	r24, 0xF7	; 247
+  c0:	80 83       	st	Z, r24
+   
+   char mode = 0;		//mod==0 : disable, mode = 1 : active
+						//char v = 1;			//변수 외부 선언
+   while(1)				//loop until Switch press
+   {
+	   if(Check() == 1) { mode = 1; break; }		//check가 1이면 모드를 1로 두고 빠져나간다
+  c2:	ed df       	rcall	.-38     	; 0x9e <Check>
+  c4:	01 97       	sbiw	r24, 0x01	; 1
+  c6:	e9 f7       	brne	.-6      	; 0xc2 <main+0x10>
+  c8:	c1 e0       	ldi	r28, 0x01	; 1
+	      }
+   while (1)
+    {
+		if(Check())
+  ca:	e9 df       	rcall	.-46     	; 0x9e <Check>
+  cc:	89 2b       	or	r24, r25
+  ce:	71 f0       	breq	.+28     	; 0xec <main+0x3a>
+  d0:	c1 11       	cpse	r28, r1
+		{
+			if(mode ==0) mode = 1;
+  d2:	02 c0       	rjmp	.+4      	; 0xd8 <main+0x26>
+  d4:	c1 e0       	ldi	r28, 0x01	; 1
+  d6:	01 c0       	rjmp	.+2      	; 0xda <main+0x28>
+  d8:	c0 e0       	ldi	r28, 0x00	; 0
+			else         mode = 0;
+  da:	2f ef       	ldi	r18, 0xFF	; 255
+	#else
+		//round up by default
+		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
+	#endif
 
-000000a2 <__stop_program>:
-  a2:	ff cf       	rjmp	.-2      	; 0xa2 <__stop_program>
+	__builtin_avr_delay_cycles(__ticks_dc);
+  dc:	83 ec       	ldi	r24, 0xC3	; 195
+  de:	99 e0       	ldi	r25, 0x09	; 9
+  e0:	21 50       	subi	r18, 0x01	; 1
+  e2:	80 40       	sbci	r24, 0x00	; 0
+  e4:	90 40       	sbci	r25, 0x00	; 0
+  e6:	e1 f7       	brne	.-8      	; 0xe0 <main+0x2e>
+  e8:	00 c0       	rjmp	.+0      	; 0xea <main+0x38>
+  ea:	00 00       	nop
+  ec:	c1 30       	cpi	r28, 0x01	; 1
+			_delay_ms(200);
+		}
+		if(mode == 1)
+  ee:	d1 f4       	brne	.+52     	; 0x124 <main+0x72>
+  f0:	e5 e6       	ldi	r30, 0x65	; 101
+		{
+			
+		PORTG |= 0x10;		// 해당 bit on
+  f2:	f0 e0       	ldi	r31, 0x00	; 0
+  f4:	80 81       	ld	r24, Z
+  f6:	80 61       	ori	r24, 0x10	; 16
+  f8:	80 83       	st	Z, r24
+  fa:	2f ef       	ldi	r18, 0xFF	; 255
+  fc:	83 ec       	ldi	r24, 0xC3	; 195
+  fe:	99 e0       	ldi	r25, 0x09	; 9
+ 100:	21 50       	subi	r18, 0x01	; 1
+ 102:	80 40       	sbci	r24, 0x00	; 0
+ 104:	90 40       	sbci	r25, 0x00	; 0
+ 106:	e1 f7       	brne	.-8      	; 0x100 <main+0x4e>
+ 108:	00 c0       	rjmp	.+0      	; 0x10a <main+0x58>
+ 10a:	00 00       	nop
+ 10c:	80 81       	ld	r24, Z
+		_delay_ms(200);		// 2/10초 (200ms)
+		PORTG &= ~0x10;		// 해당 bit OFF
+ 10e:	8f 7e       	andi	r24, 0xEF	; 239
+ 110:	80 83       	st	Z, r24
+ 112:	2f ef       	ldi	r18, 0xFF	; 255
+ 114:	83 ec       	ldi	r24, 0xC3	; 195
+ 116:	99 e0       	ldi	r25, 0x09	; 9
+ 118:	21 50       	subi	r18, 0x01	; 1
+ 11a:	80 40       	sbci	r24, 0x00	; 0
+ 11c:	90 40       	sbci	r25, 0x00	; 0
+ 11e:	e1 f7       	brne	.-8      	; 0x118 <main+0x66>
+ 120:	00 c0       	rjmp	.+0      	; 0x122 <main+0x70>
+ 122:	00 00       	nop
+		_delay_ms(200);		// 2/10초 (200ms)
+		}
+		if(Check())
+ 124:	bc df       	rcall	.-136    	; 0x9e <Check>
+ 126:	89 2b       	or	r24, r25
+ 128:	29 f0       	breq	.+10     	; 0x134 <main+0x82>
+ 12a:	c1 30       	cpi	r28, 0x01	; 1
+		{
+			if(mode == 1 ) mode = 0;
+ 12c:	11 f4       	brne	.+4      	; 0x132 <main+0x80>
+ 12e:	c0 e0       	ldi	r28, 0x00	; 0
+ 130:	01 c0       	rjmp	.+2      	; 0x134 <main+0x82>
+ 132:	c1 e0       	ldi	r28, 0x01	; 1
+			else mode = 1;
+ 134:	2f ef       	ldi	r18, 0xFF	; 255
+ 136:	81 ee       	ldi	r24, 0xE1	; 225
+ 138:	94 e0       	ldi	r25, 0x04	; 4
+ 13a:	21 50       	subi	r18, 0x01	; 1
+ 13c:	80 40       	sbci	r24, 0x00	; 0
+ 13e:	90 40       	sbci	r25, 0x00	; 0
+ 140:	e1 f7       	brne	.-8      	; 0x13a <main+0x88>
+ 142:	00 c0       	rjmp	.+0      	; 0x144 <main+0x92>
+ 144:	00 00       	nop
+ 146:	c1 cf       	rjmp	.-126    	; 0xca <main+0x18>
+
+00000148 <_exit>:
+ 148:	f8 94       	cli
+
+0000014a <__stop_program>:
+ 14a:	ff cf       	rjmp	.-2      	; 0x14a <__stop_program>

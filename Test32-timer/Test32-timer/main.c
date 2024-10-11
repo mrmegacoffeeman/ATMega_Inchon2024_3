@@ -1,7 +1,7 @@
 /*
- * Test01.c
+ * Test32-timer.c
  *
- * Created: 2024-10-02 오후 12:17:23
+ * Created: 2024-10-11 오후 2:32:54
  * Author : user
  */ 
 
@@ -11,8 +11,7 @@
 int main(void)
 {
     /* Replace with your application code */
-    printf("hello world!")
-	while (1) 
+    while (1) 
     {
     }
 }
