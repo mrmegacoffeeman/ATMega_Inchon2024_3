@@ -9,6 +9,10 @@ Project("{54F91283-7BC4-4236-8FF9-10F437C3AD48}") = "Test02-GPIO", "Test02-GPIO\
 EndProject
 Project("{54F91283-7BC4-4236-8FF9-10F437C3AD48}") = "Test03-Timer", "Test03-Timer\Test03-Timer.cproj", "{08228587-1F52-4A0A-A118-84B060063FC5}"
 EndProject
+Project("{54F91283-7BC4-4236-8FF9-10F437C3AD48}") = "Test06 - PWM", "Test06 - PWM\Test06 - PWM.cproj", "{538F0111-8631-4E2E-BC92-E07BD0584A38}"
+EndProject
+Project("{54F91283-7BC4-4236-8FF9-10F437C3AD48}") = "Test07-UART", "Test07-UART\Test07-UART.cproj", "{0AD44728-6800-42A7-8A23-A137E42222C0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|AVR = Debug|AVR
@@ -27,6 +31,14 @@ Global
 		{08228587-1F52-4A0A-A118-84B060063FC5}.Debug|AVR.Build.0 = Debug|AVR
 		{08228587-1F52-4A0A-A118-84B060063FC5}.Release|AVR.ActiveCfg = Release|AVR
 		{08228587-1F52-4A0A-A118-84B060063FC5}.Release|AVR.Build.0 = Release|AVR
+		{538F0111-8631-4E2E-BC92-E07BD0584A38}.Debug|AVR.ActiveCfg = Debug|AVR
+		{538F0111-8631-4E2E-BC92-E07BD0584A38}.Debug|AVR.Build.0 = Debug|AVR
+		{538F0111-8631-4E2E-BC92-E07BD0584A38}.Release|AVR.ActiveCfg = Release|AVR
+		{538F0111-8631-4E2E-BC92-E07BD0584A38}.Release|AVR.Build.0 = Release|AVR
+		{0AD44728-6800-42A7-8A23-A137E42222C0}.Debug|AVR.ActiveCfg = Debug|AVR
+		{0AD44728-6800-42A7-8A23-A137E42222C0}.Debug|AVR.Build.0 = Debug|AVR
+		{0AD44728-6800-42A7-8A23-A137E42222C0}.Release|AVR.ActiveCfg = Release|AVR
+		{0AD44728-6800-42A7-8A23-A137E42222C0}.Release|AVR.Build.0 = Release|AVR
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
